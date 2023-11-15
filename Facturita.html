@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factura</title>
+  <style>
+    table {
+      border: black 1px solid;
+      border-collapse: collapse;
+    }
+    td, th {
+      border: black 1px solid;
+      border-collapse: collapse;
+    }
+    thead {
+      background-color: blue;
+      color: white;
+    }
+    tbody {
+      background-color: lightblue;
+    }
+  </style>
+</head>
+<body>
+  <h2>Factura</h2>
+  <div align="center">
+    <label>Concepto <input type="text" id="concept"/></label> <br />
+    <label>Cantidad <input type="number" id="cant"/></label> <br />
+    <label>Precio <input type="number" id="price"/>€</label> <br /><br>
+    <button onclick="add()">Insertar</button><br>
+
+    <table id="facture">
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Precio Total</th>
+          <th></th>
+        </tr>  
+      </thead>
+      <tbody></tbody> 
+      <tfoot>
+        <tr>
+          <td colspan="3">Subtotal</td>
+          <td id="total">0.00€</td> 
+          <td></td>
+        </tr>
+        <tr>
+          <td>Tasa:</td>
+          <td style="color: red;" id="tax"><strong>5%</strong></td>
+          <td>Impuestos:</td> 
+          <td id="increment">0.00€</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="3">TOTAL</td>
+          <td id="TOTAL">0.00€</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+    <input type="submit" value="Tasa 5%" onclick="applyTax(5)"/>
+    <input type="submit" value="Tasa 15%" onclick="applyTax(15)"/>
+    <input type="submit" value="Tasa 30%" onclick="applyTax(30)"/>
+  </div>
+  <script>
+    function add() {
+      var concept = document.getElementById("concept").value;
+      var cant = document.getElementById("cant").value;
+      var price = parseFloat(document.getElementById("price").value);
+      var tableBody = document.querySelector("#facture tbody");
+      var newRow = tableBody.insertRow();
+      newRow.insertCell().innerHTML = concept;
+      newRow.insertCell().innerHTML = cant;
+      newRow.insertCell().innerHTML = price.toFixed(2);
+      newRow.insertCell().innerHTML = (price * cant).toFixed(2) + "€";
+      newRow.insertCell().innerHTML = '<button onclick="remove(this.parentNode.parentNode)">X</button>';
+      updateTotal();
+      applyTax(parseFloat(document.getElementById("tax").innerText));
+      clearInputs();
+    }
+    function remove(row) {
+      row.parentNode.removeChild(row);
+      updateTotal();
+      applyTax(parseFloat(document.getElementById("tax").innerText));
+    }
+    function applyTax(newTax) {
+      document.getElementById("tax").innerHTML = "<strong>" + newTax + "%" + "</strong>";
+      updateTotal();
+    }
+    function updateTotal() {
+      var subtotalCell = document.getElementById("total");
+      var incrementCell = document.getElementById("increment");
+      var totalCell = document.getElementById("TOTAL");
+      var rows = document.querySelectorAll("#facture tbody tr");
+      var subtotal = 0;
+      rows.forEach(function (row) {
+        subtotal += parseFloat(row.cells[3].innerText);
+      });
+      subtotalCell.innerText = subtotal.toFixed(2) + "€";
+      incrementCell.innerText = ((subtotal * parseFloat(document.getElementById("tax").innerText)) / 100).toFixed(2) + "€";
+      totalCell.innerText = (subtotal + parseFloat(incrementCell.innerText)).toFixed(2) + "€";
+    }
+    function clearInputs() {
+      document.getElementById("concept").value = "";
+      document.getElementById("cant").value = "";
+      document.getElementById("price").value = "";
+    }
+  </script>
+</body>
+</html>
